@@ -24,7 +24,7 @@
 
 
 //Global variables and defines
-std::vector<std::vector<int>> Pascal_triangle;
+std::vector<std::vector<unsigned long>> Pascal_triangle;
 //
 
 //Function Prototypes
@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
 		//Set size
 		std::cout << "Enter the size of the set: ";
 		std::cin >> SetSize;
-
+		int* size_ptr = &SetSize;
 		//Create thread to start computing triangle
-		FillTrianglehandle = CreateThread(0, 0, FillTriangle, &SetSize, 0, &FillTrianglethreadid);
+		FillTrianglehandle = CreateThread(0, 0, FillTriangle, size_ptr, 0, &FillTrianglethreadid);
 
 		//Choose size
 		std::cout << "Enter the number to choose from that set: ";
@@ -65,59 +65,73 @@ int main(int argc, char* argv[])
 		std::cout << std::endl << "The triangle resulting from the input of " << SetSize << " is:" << std::endl << std::endl;
 
 		//print the triangle
+		int row = 0;
 		for ( auto r : Pascal_triangle) //cycle through each row
 		{
+			std::cout << "[" << row << "]\t";
 			for (auto c : r) //cycle through each column in that row
 			{
-				std::cout << c << "\t";
+				if (c > 9999999)
+				{
+					std::cout << std::scientific << c << "\t";
+				}
+				else
+				{
+					std::cout << c << "\t";
+				}
 			}
 			std::cout << std::endl;
+			row++;
 		}
 
 		//out put the answer to the question
 
-		std::cout << std::endl << "The number of distict choices you can have when picking " << SetChoose << " from " << SetSize << "is :" << std::endl;
-		std::cout << (Pascal_triangle[Pascal_triangle.size() - 1])[SetChoose - 1]; //select the part that we want from the vector
+		std::cout << std::endl << "The number of distict choices you can have when picking " << SetChoose << " from " << SetSize << " is :" << std::endl;
+		std::cout << (Pascal_triangle[Pascal_triangle.size() - 1])[SetChoose]; //select the part that we want from the vector
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//FillTriangle Declaration
+//FillTriangle thread
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DWORD WINAPI FillTriangle(LPVOID row)
+DWORD WINAPI FillTriangle(LPVOID sRow)
 {
-	int rows = (int)row;
+	int rows = *static_cast<int *>(sRow);
 	if (rows <= 0)
 	{
 		return 1;
 	}
 	
-	std::vector<int> row1; // create a reuseable vector for current row
+	std::vector<unsigned long> preRow; // create a reuseable vector for the previous row
 	//fill row 1
-	row1.push_back(1);
-	Pascal_triangle.push_back(row1);
+	preRow.push_back((unsigned long)1);
+	Pascal_triangle.push_back(preRow);
 
 
 	int count = 0; //count for while loop
-	unsigned int rowNum = 2;//start at two because rows one and two were manually filled; must be positive
 	unsigned int numIdx;//column number index; must be positive
 
-	for (count = 2; count <= rows; count++)
+	for (count = 1; count <= rows; count++)
 	{
-		std::vector<int> curRow;
-		curRow.push_back(1);//put first '1' into the line
+		//create a vector for this row and put the first '1' in the row
+		std::vector<unsigned long> curRow;
+		curRow.push_back((unsigned long)1);//put first '1' into the line
 
-		for (numIdx = 0; numIdx < ((Pascal_triangle[rowNum]).size() - 1); numIdx++)
+		//fill the rest of the numbers
+		for (numIdx = 0; numIdx < preRow.size() - 1; numIdx++)
 		{
-			curRow.push_back((Pascal_triangle[rowNum])[numIdx] + (Pascal_triangle[rowNum])[numIdx + 1]);
+			curRow.push_back(preRow[numIdx] + preRow[numIdx + 1]);
 			//fill the middle numbers
 		}
 
+		//finalization for next row
+		curRow.push_back((unsigned long)1);//put the last number in
 
-		curRow.push_back(1);//put the last number in
-		count++;//increase count
-		rowNum++;//increase row
+
+		
+		Pascal_triangle.push_back(curRow);//push the latest row to the triangle
+		preRow = curRow;//update the previous row to the current one for the next iteration
 	}
 
 	return 1;
