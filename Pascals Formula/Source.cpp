@@ -61,33 +61,33 @@ int main(int argc, char* argv[])
 	//perform calculation
 		WaitForSingleObject(FillTrianglehandle, INFINITE);
 	//Output results
-		
-		std::cout << std::endl << "The triangle resulting from the input of " << SetSize << " is:" << std::endl << std::endl;
-
-		//print the triangle
-		int row = 0;
-		for ( auto r : Pascal_triangle) //cycle through each row
+		//print the triangle if possible
+		if (SetSize <= 20)
 		{
-			std::cout << "[" << row << "]\t";
-			for (auto c : r) //cycle through each column in that row
+			std::cout << std::endl << "The triangle resulting from the input of " << SetSize << " is:" << std::endl << std::endl;
+
+			std::cout << "Interpritation: row is the set size, and the column is the number chosen (starting at Zero(0))" << std::endl;
+
+			int row = 0;
+			for (auto r : Pascal_triangle) //cycle through each row
 			{
-				if (c > 9999999)
-				{
-					std::cout << std::scientific << c << "\t";
-				}
-				else
+				std::cout << "[" << row << "]\t";
+				for (auto c : r) //cycle through each column in that row
 				{
 					std::cout << c << "\t";
 				}
+				std::cout << std::endl;
+				row++;
 			}
-			std::cout << std::endl;
-			row++;
 		}
-
+		else
+		{
+			std::cout << "Printing a triangle that size would make it unreadable, please use a set smaller than 20 for triangle output." << std::endl;
+		}
 		//out put the answer to the question
 
 		std::cout << std::endl << "The number of distict choices you can have when picking " << SetChoose << " from " << SetSize << " is :" << std::endl;
-		std::cout << (Pascal_triangle[Pascal_triangle.size() - 1])[SetChoose]; //select the part that we want from the vector
+		std::cout << (Pascal_triangle[Pascal_triangle.size() - 1])[SetChoose] << std::endl; //select the part that we want from the vector
 }
 
 
